@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Toolkit",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0",
   "identifier": "com.toolkit.desktop",
   "build": {
     "frontendDist": "../dist",

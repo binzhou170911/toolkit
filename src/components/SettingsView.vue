@@ -59,7 +59,7 @@ const themes = [
             <Clipboard class="w-5 h-5" />
             <div>
               <div class="text-sm font-medium">智能监听</div>
-              <div class="text-xs text-muted-foreground">自动检测剪贴板内容并推荐工具</div>
+              <div class="text-xs text-muted-foreground">自动检测内容并推荐工具</div>
             </div>
           </div>
           <button
