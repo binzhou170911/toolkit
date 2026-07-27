@@ -121,6 +121,91 @@ function escapeXml(str: string): string {
     .replace(/'/g, '&apos;')
 }
 
+function toPascalCase(str: string): string {
+  return str
+    .replace(/[^a-zA-Z0-9]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join('')
+}
+
+function inferType(value: any, key: string, interfaces: Map<string, string>): string {
+  if (value === null) return 'null'
+  if (value === undefined) return 'any'
+
+  if (Array.isArray(value)) {
+    if (value.length === 0) return 'any[]'
+    const first = value[0]
+    if (typeof first === 'object' && first !== null && !Array.isArray(first)) {
+      const name = toPascalCase(key)
+      generateInterface(name, first, interfaces)
+      return `${name}[]`
+    }
+    const elementType = inferType(first, key, interfaces)
+    return `${elementType}[]`
+  }
+
+  if (typeof value === 'object') {
+    const name = toPascalCase(key)
+    generateInterface(name, value, interfaces)
+    return name
+  }
+
+  return typeof value
+}
+
+function generateInterface(name: string, obj: Record<string, any>, interfaces: Map<string, string>): void {
+  if (interfaces.has(name)) return
+
+  // Reserve the name to prevent infinite recursion
+  interfaces.set(name, '')
+
+  const fields: string[] = []
+  for (const [key, value] of Object.entries(obj)) {
+    const type = inferType(value, key, interfaces)
+    fields.push(`  ${key}: ${type};`)
+  }
+
+  interfaces.set(name, `interface ${name} {\n${fields.join('\n')}\n}`)
+}
+
+function jsonToTypescript(input: string): string {
+  try {
+    const parsed = JSON.parse(input)
+
+    if (typeof parsed !== 'object' || parsed === null) {
+      return `type RootType = ${typeof parsed};`
+    }
+
+    const interfaces = new Map<string, string>()
+
+    if (Array.isArray(parsed)) {
+      if (parsed.length === 0) return 'type RootType = any[];'
+      const first = parsed[0]
+      if (typeof first === 'object' && first !== null) {
+        generateInterface('RootObject', first, interfaces)
+      } else {
+        return `type RootType = ${typeof first}[];`
+      }
+    } else {
+      generateInterface('RootObject', parsed, interfaces)
+    }
+
+    // Output in dependency order (simple: RootObject last)
+    const entries = [...interfaces.entries()]
+    const rootIndex = entries.findIndex(([name]) => name === 'RootObject')
+    if (rootIndex > 0) {
+      const [root] = entries.splice(rootIndex, 1)
+      entries.push(root)
+    }
+
+    return entries.map(([, def]) => def).join('\n\n')
+  } catch (error) {
+    throw new Error(`Invalid JSON: ${error}`)
+  }
+}
+
 function extractKeys(input: string): string {
   try {
     const parsed = JSON.parse(input)
@@ -157,7 +242,7 @@ export const jsonFormatterTool: Tool = {
   description: '格式化、压缩、验证、转换 JSON 数据',
   icon: '📋',
   category: '文本',
-  keywords: ['json', '格式化', 'format', 'beautify', '压缩', 'minify', '验证', 'validate'],
+  keywords: ['json', '格式化', 'format', 'beautify', '压缩', 'minify', '验证', 'validate', 'typescript', 'ts', '类型', 'type', 'interface'],
   inputType: 'text',
   outputType: 'text',
   actions: [
@@ -190,6 +275,11 @@ export const jsonFormatterTool: Tool = {
       id: 'extract-keys',
       name: '提取 Keys',
       execute: extractKeys
+    },
+    {
+      id: 'to-typescript',
+      name: '转 TypeScript',
+      execute: jsonToTypescript
     }
   ],
   detect: (content: string) => {

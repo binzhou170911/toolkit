@@ -11,6 +11,9 @@ import { timestampConverterTool } from './timestamp-converter'
 import { documentConverterTool } from './document-converter'
 import { calculatorTool } from './calculator'
 import { aiHubTool } from './ai-hub'
+import { colorPickerTool } from './color-picker'
+import { gomokuTool } from './gomoku'
+import { imageCombinerTool } from './image-combiner'
 
 // Register all tools
 export function registerAllTools() {
@@ -25,7 +28,10 @@ export function registerAllTools() {
     timestampConverterTool,
     documentConverterTool,
     calculatorTool,
-    aiHubTool
+    aiHubTool,
+    colorPickerTool,
+    gomokuTool,
+    imageCombinerTool
   ]
 
   tools.forEach(tool => toolsStore.registerTool(tool))
@@ -41,5 +47,8 @@ export {
   timestampConverterTool,
   documentConverterTool,
   calculatorTool,
-  aiHubTool
+  aiHubTool,
+  colorPickerTool,
+  gomokuTool,
+  imageCombinerTool
 }

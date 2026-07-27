@@ -3,7 +3,8 @@
   "identifier": "default",
   "description": "enables the default permissions",
   "windows": [
-    "main"
+    "main",
+    "magnifier"
   ],
   "permissions": [
     "core:default",
@@ -19,11 +20,16 @@
     "core:window:allow-show",
     "core:window:allow-hide",
     "core:window:allow-minimize",
+    "core:window:allow-unminimize",
     "core:window:allow-set-focus",
     "core:window:allow-is-visible",
     "core:window:allow-toggle-maximize",
     "core:window:allow-is-maximized",
     "core:window:allow-start-dragging",
+    "core:window:allow-set-position",
+    "core:window:allow-outer-position",
+    "core:window:allow-outer-size",
+    "core:window:allow-destroy",
     "core:webview:default",
     "core:webview:allow-create-webview",
     "core:webview:allow-create-webview-window",
@@ -37,8 +43,21 @@
     "dialog:default",
     "dialog:allow-save",
     "fs:default",
-    "fs:allow-write-text-file",
-    "fs:allow-write-file",
-    "fs:allow-read-file"
+    {
+      "identifier": "fs:allow-read-file",
+      "allow": [{ "path": "$HOME/**" }]
+    },
+    {
+      "identifier": "fs:allow-write-text-file",
+      "allow": [{ "path": "$HOME/**" }]
+    },
+    {
+      "identifier": "fs:allow-write-file",
+      "allow": [{ "path": "$HOME/**" }]
+    },
+    {
+      "identifier": "fs:allow-mkdir",
+      "allow": [{ "path": "$HOME/**" }]
+    }
   ]
 }

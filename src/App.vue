@@ -8,10 +8,17 @@ import HistoryView from './components/HistoryView.vue'
 import DocumentConverterView from './components/DocumentConverterView.vue'
 import CalculatorView from './components/CalculatorView.vue'
 import AIHubView from './components/AIHubView.vue'
+import ColorPickerView from './components/ColorPickerView.vue'
+import GomokuView from './components/GomokuView.vue'
+import ImageCombinerView from './components/ImageCombinerView.vue'
+import MagnifierView from './components/MagnifierView.vue'
 import TitleBar from './components/TitleBar.vue'
 import ToastContainer from './components/ToastContainer.vue'
 
-const currentView = ref<'search' | 'tool' | 'settings' | 'history' | 'document-converter' | 'calculator' | 'ai-hub'>('search')
+// Detect if this is the magnifier window
+const isMagnifier = window.location.hash === '#magnifier'
+
+const currentView = ref<'search' | 'tool' | 'settings' | 'history' | 'document-converter' | 'calculator' | 'ai-hub' | 'color-picker' | 'gomoku' | 'image-combiner'>('search')
 const selectedToolId = ref<string | null>(null)
 const initialModelId = ref<string | undefined>(undefined)
 
@@ -23,6 +30,12 @@ function handleSelectTool(toolId: string, options?: { modelId?: string }) {
   } else if (toolId === 'ai-hub') {
     initialModelId.value = options?.modelId
     currentView.value = 'ai-hub'
+  } else if (toolId === 'color-picker') {
+    currentView.value = 'color-picker'
+  } else if (toolId === 'gomoku') {
+    currentView.value = 'gomoku'
+  } else if (toolId === 'image-combiner') {
+    currentView.value = 'image-combiner'
   } else {
     selectedToolId.value = toolId
     currentView.value = 'tool'
@@ -48,7 +61,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="h-screen flex flex-col text-foreground overflow-hidden rounded-xl border border-border animate-scale-in bg-background">
+  <!-- Magnifier window -->
+  <MagnifierView v-if="isMagnifier" />
+
+  <!-- Normal app -->
+  <div v-else class="h-screen flex flex-col text-foreground overflow-hidden rounded-xl border border-border animate-scale-in bg-background">
     <TitleBar
       @open-settings="handleOpenSettings"
       @open-history="handleOpenHistory"
@@ -84,6 +101,21 @@ onMounted(() => {
           v-else-if="currentView === 'ai-hub'"
           key="ai-hub"
           :initial-model-id="initialModelId"
+          @back="handleBackToSearch"
+        />
+        <ColorPickerView
+          v-else-if="currentView === 'color-picker'"
+          key="color-picker"
+          @back="handleBackToSearch"
+        />
+        <GomokuView
+          v-else-if="currentView === 'gomoku'"
+          key="gomoku"
+          @back="handleBackToSearch"
+        />
+        <ImageCombinerView
+          v-else-if="currentView === 'image-combiner'"
+          key="image-combiner"
           @back="handleBackToSearch"
         />
         <SettingsView

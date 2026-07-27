@@ -1,7 +1,8 @@
 import * as pdfjsLib from 'pdfjs-dist'
+// 本地化 worker（去 CDN，离线可用）
+import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 
-// Set up the worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl
 
 export async function pdfToText(arrayBuffer: ArrayBuffer): Promise<string> {
   try {
